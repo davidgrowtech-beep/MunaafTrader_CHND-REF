@@ -33,7 +33,8 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
     --text-light:#f4f4f4;
     --text-dim:#a8adb5;
   }
-  *{margin:0;padding:0;box-sizing:border-box;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   html,body{
     width:100%;
     overflow-x:hidden;
@@ -47,13 +48,19 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
       radial-gradient(circle at 80% 100%, rgba(31,191,117,0.10), transparent 40%),
       var(--bg-dark);
     min-height:100vh;
+    min-height:100dvh;
     display:flex;
     flex-direction:column;
     align-items:center;
-    padding:0 0 100px 0;
+    padding:0 0 calc(100px + env(safe-area-inset-bottom)) 0;
   }
 
-  .container{width:100%;max-width:480px;padding:0 18px;}
+  .container{width:100%;max-width:480px;padding:0 clamp(14px,4vw,22px);margin:0 auto;}
+
+  @media (min-width:600px){
+    .container{max-width:520px;}
+    .hero-card{padding:26px;}
+  }
 
   header{
     text-align:center;
@@ -84,17 +91,18 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
     margin-bottom:14px;
   }
   h1{
-    font-size:24px;
+    font-size:clamp(19px,5.6vw,25px);
     line-height:1.35;
     background:linear-gradient(90deg,var(--gold-light),var(--gold));
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
     font-weight:800;
+    word-break:break-word;
   }
   .subtitle{
     margin-top:10px;
-    font-size:15px;
+    font-size:clamp(13px,3.6vw,15px);
     color:var(--text-dim);
     line-height:1.6;
   }
@@ -110,11 +118,13 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
   .stats-row{
     display:flex;
     justify-content:space-between;
-    gap:10px;
+    gap:8px;
     margin-bottom:18px;
+    flex-wrap:wrap;
   }
   .stat{
-    flex:1;
+    flex:1 1 30%;
+    min-width:80px;
     text-align:center;
     background:rgba(255,255,255,0.03);
     border-radius:12px;
@@ -122,12 +132,13 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
     border:1px solid rgba(255,255,255,0.06);
   }
   .stat .num{
-    font-size:18px;
+    font-size:clamp(15px,4.2vw,18px);
     font-weight:800;
     color:var(--green);
+    white-space:nowrap;
   }
   .stat .label{
-    font-size:11px;
+    font-size:clamp(9.5px,2.6vw,11px);
     color:var(--text-dim);
     margin-top:4px;
   }
@@ -170,24 +181,25 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
     text-align:center;
   }
   .cta-btn{
-    display:block;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     width:100%;
+    min-height:52px;
     text-decoration:none;
     background:linear-gradient(90deg,#25d366,#1fbf75);
     color:#08120c;
     font-weight:800;
-    font-size:17px;
-    padding:16px 10px;
+    font-size:clamp(14.5px,4vw,17px);
+    padding:14px 10px;
     border-radius:14px;
     box-shadow:0 8px 22px rgba(31,191,117,0.35);
     transition:transform .15s ease, opacity .15s ease;
     position:relative;
+    text-align:center;
+    line-height:1.3;
   }
   .cta-btn:active{transform:scale(0.97);}
-  .cta-btn.disabled{
-    opacity:0.55;
-    pointer-events:none;
-  }
   .cta-sub{
     margin-top:10px;
     font-size:12px;
@@ -230,8 +242,8 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
   /* Fixed bottom-right agency ad button */
   .agency-badge{
     position:fixed;
-    bottom:14px;
-    right:14px;
+    bottom:calc(14px + env(safe-area-inset-bottom));
+    right:calc(14px + env(safe-area-inset-right));
     z-index:999;
     background:rgba(20,25,32,0.92);
     border:1px solid rgba(212,175,55,0.4);
@@ -251,8 +263,19 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
   }
 
   @media (max-width:360px){
-    h1{font-size:21px;}
-    .cta-btn{font-size:15.5px;padding:14px 8px;}
+    .logo-wrap img{width:72px;height:72px;}
+    .stat{padding:10px 4px;}
+  }
+
+  @media (max-height:640px) and (orientation:landscape){
+    header{padding:16px 18px 10px;}
+    .logo-wrap img{width:60px;height:60px;}
+    body{padding-bottom:70px;}
+  }
+
+  @media (max-width:340px){
+    .trust-row{gap:10px;}
+    .trust-item{font-size:10.5px;}
   }
 </style>
 </head>
@@ -294,7 +317,7 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
     <div class="urgency">⚡ లిమిటెడ్ స్లాట్స్ — ఇప్పుడే జాయిన్ అవ్వండి, మిస్ చేయకండి!</div>
 
     <div class="cta-wrap">
-      <a href="#" id="ctaBtn" class="cta-btn disabled">🔒 దయచేసి 3 సెకన్లు వేచి ఉండండి...</a>
+      <a href="https://t.me/+t-lmRkKwZOhkZTBl" id="ctaBtn" class="cta-btn">✅ టెలిగ్రామ్ చానల్‌లో జాయిన్ అవ్వండి</a>
       <div class="cta-sub">బటన్ నొక్కి టెలిగ్రామ్ చానల్‌లో జాయిన్ అవ్వండి</div>
       <div class="timer-note">జాయిన్ రిక్వెస్ట్ పంపిన తర్వాత <b>admin approval</b> కోసం వేచి ఉండండి</div>
     </div>
@@ -320,32 +343,18 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
   "use strict";
 
   var TG_LINK = "https://t.me/+t-lmRkKwZOhkZTBl";
-  var MIN_DWELL_MS = 3000;      // minimum time on page before button is usable
   var STORAGE_KEY = "munaaf_lead_fired_v1";
 
   var btn = document.getElementById("ctaBtn");
   var pageLoadTime = Date.now();
   var userInteracted = false;   // set true on genuine pointer/touch/scroll activity
-  var enabled = false;
 
-  // --- Bot / fake-click mitigation signals ---
+  // --- Bot signal only, never blocks the click itself ---
   function markInteraction(){ userInteracted = true; }
   window.addEventListener("scroll", markInteraction, {passive:true});
   window.addEventListener("touchstart", markInteraction, {passive:true});
   window.addEventListener("pointermove", markInteraction, {passive:true});
   window.addEventListener("mousemove", markInteraction, {passive:true});
-  document.addEventListener("visibilitychange", function(){
-    if(document.visibilityState === "visible"){ markInteraction(); }
-  });
-
-  function enableButton(){
-    enabled = true;
-    btn.classList.remove("disabled");
-    btn.innerHTML = "✅ టెలిగ్రామ్ చానల్‌లో జాయిన్ అవ్వండి";
-  }
-
-  // Enable only after minimum dwell time has passed
-  setTimeout(enableButton, MIN_DWELL_MS);
 
   function alreadyFired(){
     try{ return sessionStorage.getItem(STORAGE_KEY) === "1"; }
@@ -355,41 +364,40 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
     try{ sessionStorage.setItem(STORAGE_KEY, "1"); }catch(e){}
   }
 
+  // The href on the button is already the real Telegram link, so even if
+  // this script fails to run, tapping the button still takes the user to
+  // Telegram. We only preventDefault when we can safely re-fire the
+  // navigation ourselves, and we always do that in the SAME tick as the
+  // click — never behind a setTimeout — because mobile in-app browsers
+  // (Instagram/Facebook webviews) silently ignore navigation requests that
+  // arrive after the user-gesture has ended.
   btn.addEventListener("click", function(evt){
-    evt.preventDefault();
+    // Reject only clearly synthetic clicks (scripted/bot), let everything else through
+    var isBotLike = (evt.isTrusted === false);
 
-    // Reject synthetic / non-trusted clicks (scripts, bots)
-    if(!evt.isTrusted){ return; }
+    if(isBotLike){
+      evt.preventDefault();
+      return;
+    }
 
-    // Reject clicks before minimum dwell time
+    // Fire the Lead event once per session, fire-and-forget — fbq uses a
+    // beacon-style request that survives navigation, so there is no need
+    // to delay the redirect for it.
     var dwell = Date.now() - pageLoadTime;
-    if(!enabled || dwell < MIN_DWELL_MS){ return; }
+    var looksGenuine = userInteracted || dwell > 400; // soft signal, not a gate
 
-    // Require at least one genuine interaction signal before firing
-    if(!userInteracted){ return; }
-
-    // Dedupe: only fire Lead once per session
-    if(!alreadyFired()){
+    if(!alreadyFired() && looksGenuine && typeof fbq === "function"){
       markFired();
       var eventId = "lead_" + Date.now() + "_" + Math.random().toString(36).slice(2,10);
-
-      if(typeof fbq === "function"){
-        fbq('track', 'Lead', {
-          content_name: 'Learning Station of Munaaf Trader',
-          content_category: 'Telegram Channel Join'
-        }, { eventID: eventId });
-      }
-
-      btn.innerHTML = "⏳ రీడైరెక్ట్ అవుతోంది...";
-
-      // Small flush delay so the pixel beacon has time to send before navigation
-      setTimeout(function(){
-        window.location.href = TG_LINK;
-      }, 350);
-    } else {
-      // Already tracked this session — just navigate, no duplicate event
-      window.location.href = TG_LINK;
+      fbq('track', 'Lead', {
+        content_name: 'Learning Station of Munaaf Trader',
+        content_category: 'Telegram Channel Join'
+      }, { eventID: eventId });
     }
+
+    // Let the browser's native navigation on the <a href> proceed as-is.
+    // No preventDefault, no setTimeout — this is what keeps the tap
+    // registered as a trusted user gesture all the way to Telegram.
   });
 
 })();
