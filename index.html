@@ -364,6 +364,41 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
     try{ sessionStorage.setItem(STORAGE_KEY, "1"); }catch(e){}
   }
 
+  // --- fbclid check: only trust traffic that actually arrived via a Meta ad click ---
+  function hasValidAdClick(){
+    try{
+      var params = new URLSearchParams(window.location.search);
+      if(params.has("fbclid")) return true;
+      // sessionStorage fallback in case fbclid was present on an earlier
+      // page in this session (e.g. redirect chain) but stripped by now.
+      return sessionStorage.getItem("munaaf_had_fbclid") === "1";
+    }catch(e){ return true; } // fail open — never block real users on an edge case
+  }
+  (function persistFbclidFlag(){
+    try{
+      if(new URLSearchParams(window.location.search).has("fbclid")){
+        sessionStorage.setItem("munaaf_had_fbclid", "1");
+      }
+    }catch(e){}
+  })();
+
+  // --- Lightweight bot-fingerprint checks (heuristics, not proof) ---
+  function looksAutomated(){
+    try{
+      if(navigator.webdriver === true) return true;
+
+      var ua = navigator.userAgent || "";
+      var claimsChrome = /Chrome\//.test(ua) && !/Edg\/|OPR\/|SamsungBrowser/.test(ua);
+      if(claimsChrome && typeof window.chrome === "undefined") return true;
+
+      var claimsMobile = /Mobi|Android|iPhone/.test(ua);
+      var hasTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
+      if(claimsMobile && !hasTouch) return true;
+
+      return false;
+    }catch(e){ return false; } // fail open
+  }
+
   // The href on the button is already the real Telegram link, so even if
   // this script fails to run, tapping the button still takes the user to
   // Telegram. We only preventDefault when we can safely re-fire the
@@ -383,10 +418,20 @@ src="https://www.facebook.com/tr?id=1357516525756643&ev=PageView&noscript=1"
     // Fire the Lead event once per session, fire-and-forget — fbq uses a
     // beacon-style request that survives navigation, so there is no need
     // to delay the redirect for it.
+    //
+    // HARD GATE (not just a soft signal): require real interaction AND
+    // enough dwell time AND a genuine ad click AND no automation
+    // fingerprints before the Lead event is allowed to fire. Navigation
+    // to Telegram still happens regardless — this only withholds the
+    // pixel fire for traffic that doesn't look like a real engaged user.
     var dwell = Date.now() - pageLoadTime;
-    var looksGenuine = userInteracted || dwell > 400; // soft signal, not a gate
+    var qualifiesAsGenuine =
+      userInteracted &&
+      dwell > 1200 &&
+      hasValidAdClick() &&
+      !looksAutomated();
 
-    if(!alreadyFired() && looksGenuine && typeof fbq === "function"){
+    if(!alreadyFired() && qualifiesAsGenuine && typeof fbq === "function"){
       markFired();
       var eventId = "lead_" + Date.now() + "_" + Math.random().toString(36).slice(2,10);
       fbq('track', 'Lead', {
